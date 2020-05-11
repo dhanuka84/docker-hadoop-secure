@@ -1,0 +1,20 @@
+version: '2'
+
+
+services:
+  kdc:
+    network_mode: host      
+    image: sequenceiq/kerberos
+    hostname: kdc.kerberos.com
+    extra_hosts:
+      - "kdc.kerberos.com kdc:192.168.0.114"
+    environment:
+      REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+    volumes:
+      - "./config_files/krb5.conf:/etc/krb5.conf"
+      - "/dev/urandom:/dev/random"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./krb5kdc:/var/kerberos/krb5kdc:rw"
+      - "./kdc-opt:/opt/"  
+

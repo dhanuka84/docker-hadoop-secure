@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+  hadoop-secure:
+    network_mode: host      
+    image: knappek/hadoop-secure:2.7.4
+    hostname: hadoop
+    domainname: docker.com
+    tty: true
+    extra_hosts:
+      - "hadoop.docker.com hadoop hive-metastore:192.168.0.114"
+      - "kdc.kerberos.com kdc:192.168.0.114"
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+      FQDN: hadoop.docker.com
+    volumes:
+      - "./config_files/krb5.conf:/etc/krb5.conf"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./keytabs:/etc/security/keytabs"
+      - "./bootstrap.sh:/etc/bootstrap.sh" 
+      - "./config_files/core-site.xml:/usr/local/hadoop/etc/hadoop/core-site.xml"
+      - "./config_files/hdfs-site.xml:/usr/local/hadoop/etc/hadoop/hdfs-site.xml"

@@ -1,0 +1,6 @@
+.project
+*.gz
+*.tgz
+*.zip
+*.rpm
+local_files

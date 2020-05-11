@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  hive-metastore:
+    network_mode: host
+    hostname: hive-metastore    
+    image: dhanuka/hive:2.3.2
+    env_file:
+      - ./hive/hadoop-hive.env
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      FQDN: hive-metastore    
+    command: /opt/hive/bin/hive --config /opt/hive/conf --service metastore
+    env_file:
+      - ./hive/hadoop-hive.env
+    extra_hosts:
+      - "hive-metastore hive-server hive-metastore-postgresql hadoop.docker.com:192.168.0.114"      
+      - "kdc.kerberos.com kdc namenode datanode:192.168.0.114"
+    volumes:  
+      - "./hive/conf:/opt/hive/conf" 
+      - "./config_files/krb5.conf:/etc/krb5.conf"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./keytabs/hive.keytab:/etc/security/keytabs/hive.keytab:ro"
+  
+    ports:
+      - "9083:9083"
+      - "10000:10000"  
+  hive-metastore-postgresql:
+    hostname: hive-metastore-postgresql
+    network_mode: host      
+    image: bde2020/hive-metastore-postgresql:2.3.0
+
+volumes:
+  namenode:
+  datanode:
