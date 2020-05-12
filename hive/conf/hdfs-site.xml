@@ -203,4 +203,8 @@
          <name>dfs.client.https.need-auth</name>
          <value>false</value>
      </property>
+     <property>
+         <name>dfs.namenode.kerberos.principal.pattern</name> 
+         <value>nn/*@EXAMPLE.COM</value> 
+     </property>
 </configuration>
