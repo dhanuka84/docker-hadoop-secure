@@ -35,91 +35,64 @@ Run image
 ---------
 
 
-Clone the [Github project](https://github.com/Knappek/docker-hadoop-secure) and run
+Clone the [Github project](https://github.com/dhanuka84/docker-hadoop-secure) and run
 
 ```
-docker-compose up -d
-```
+docker-compose -f docker-kdc.yml up -d
 
-Usage
------
-
-Get the container name with `docker ps` and login to the container with
-
-```
 docker exec -it <container-name> /bin/bash
-```
+
+kadmin.local:  addprinc -randkey nn/hadoop.docker.com@EXAMPLE.COM
+
+kadmin.local:  addprinc -randkey dn/hadoop.docker.com@EXAMPLE.COM
+
+kadmin.local:  addprinc -randkey spnego/hadoop.docker.com@EXAMPLE.COM
+
+kadmin.local:  addprinc -randkey jhs/hadoop.docker.com@EXAMPLE.COM
+
+kadmin.local:  addprinc -randkey yarn/hadoop.docker.com@EXAMPLE.COM
+
+kadmin.local:  addprinc -randkey rm/hadoop.docker.com@EXAMPLE.COM
+
+kadmin.local:  addprinc -randkey nm/hadoop.docker.com@EXAMPLE.COM
 
 
-To obtain a Kerberos ticket, execute
+kadmin.local:  addprinc -randkey hive/hadoop.docker.com@EXAMPLE.COM
 
-```
+kadmin.local:  addprinc -randkey hive/hive-metastore@EXAMPLE.COM
+
+--------------------------------------
+
+
+kadmin.local:  ktadd -k /opt/nn.service.keytab  nn/hadoop.docker.com
+
+kadmin.local:  ktadd -k /opt/dn.service.keytab  dn/hadoop.docker.com
+
+kadmin.local:  ktadd -k /opt/spnego.service.keytab  spnego/hadoop.docker.com
+
+kadmin.local:  ktadd -k /opt/jhs.service.keytab  jhs/hadoop.docker.com
+
+kadmin.local:  ktadd -k /opt/yarn.service.keytab  yarn/hadoop.docker.com
+
+kadmin.local:  ktadd -k /opt/nm.service.keytab  nm/hadoop.docker.com
+
+kadmin.local:  ktadd -k /opt/rm.service.keytab  rm/hadoop.docker.com
+
+
+kadmin.local:  ktadd -k /opt/hive.keytab  hive/hive-metastore
+
+------------------------------------------
+
+kinit nn/hadoop.docker.com@EXAMPLE.COM -k -t /etc/security/keytabs/nn.service.keytab 
+
+
+
+docker-compose -f docker-hdfs.yml up -d
+
+docker exec -it <container-name> /bin/bash
+
 kinit
-```
 
-where you will get prompted to enter your password. Afterwards you can use `hdfs` CLI like
-
-```
-hdfs dfs -ls /
-```
-
-
-Known issues
-------------
-
-### Unable to obtain Kerberos password
-
-#### Error
-docker-compose up fails for the first time with the error
-
-```
-Login failure for nn/hadoop.docker.com@EXAMPLE.COM from keytab /etc/security/keytabs/nn.service.keytab: javax.security.auth.login.LoginException: Unable to obtain password from user
-```
-
-#### Solution
-
-Stop the containers with `docker-compose down` and start again with `docker-compose up -d`.
-
-
-### JDK 8
-
-Make sure you use download a JDK version that is still available. Old versions can be deprecated by Oracle and thus the download link won't be able anymore.
-
-Get the latest JDK8 Download URL with
-
-```
-curl -s https://lv.binarybabel.org/catalog-api/java/jdk8.json
-```
-
-### Java Keystore
-
-If the Keystroe has been expired, then create a new `keystore.jks`:
-
-1. create private key
-
-```
-openssl genrsa -des3 -out server.key 1024
-```
-
-2. create csr
-
-```
-openssl req -new -key server.key -out server.csr`
-```
-
-3. remove passphrase in key
-```
-cp server.key server.key.org
-openssl rsa -in server.key.org -out server.key
-```
-
-3. create self-signed cert
-```
-openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
-```
-
-4. create JKS and import certificate
-```
-keytool -import -keystore keystore.jks -alias CARoot -file server.crt`
+docker-compose -f docker-hive.yml up -d
 ```
 
